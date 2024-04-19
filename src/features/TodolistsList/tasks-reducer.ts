@@ -13,6 +13,8 @@ import {
 import { Dispatch } from 'redux'
 import { AppRootStateType } from '../../app/store'
 import { AppActionsType, setErrorAC, setStatusAC } from '../../app/app-reducer'
+import axios, { AxiosError } from 'axios'
+import { handleServerAppError, handleServerNetworkError } from '../../utills/error-utills'
 
 const initialState: TasksStateType = {}
 
@@ -85,9 +87,10 @@ export const removeTaskTC =
     })
   }
 export const addTaskTC =
-  (title: string, todolistId: string) => (dispatch: Dispatch<ActionsType>) => {
+  (title: string, todolistId: string) => async (dispatch: Dispatch<ActionsType>) => {
     dispatch(setStatusAC('loading'))
-    todolistsAPI.createTask(todolistId, title).then((res) => {
+    try {
+      const res = await todolistsAPI.createTask(todolistId, title)
       if (res.data.resultCode === 0) {
         const task = res.data.data.item
         dispatch(addTaskAC(task))
@@ -100,8 +103,15 @@ export const addTaskTC =
         }
         dispatch(setStatusAC('failed'))
       }
-    })
+    } catch (e: any) {
+      if (axios.isAxiosError(e)) {
+        handleServerNetworkError(dispatch, e.message)
+      } else {
+        dispatch(setErrorAC('SOME ERROR!'))
+      }
+    }
   }
+
 export const updateTaskTC =
   (taskId: string, domainModel: UpdateDomainTaskModelType, todolistId: string) =>
   (dispatch: Dispatch<ActionsType>, getState: () => AppRootStateType) => {
@@ -122,10 +132,21 @@ export const updateTaskTC =
       status: task.status,
       ...domainModel,
     }
-    todolistsAPI.updateTask(todolistId, taskId, apiModel).then((res) => {
-      dispatch(updateTaskAC(taskId, domainModel, todolistId))
-      dispatch(setStatusAC('succeeded'))
-    })
+    todolistsAPI
+      .updateTask(todolistId, taskId, apiModel)
+      .then((res) => {
+        if (res.data.resultCode === 0) {
+          dispatch(updateTaskAC(taskId, domainModel, todolistId))
+          dispatch(setStatusAC('succeeded'))
+        } else {
+          handleServerAppError<{ item: TaskType }>(dispatch, res.data)
+        }
+      })
+      .catch((e: AxiosError) => {
+        // dispatch(setErrorAC(e.message))
+        // dispatch(setStatusAC('failed'))
+        handleServerNetworkError(dispatch, e.message)
+      })
   }
 
 // types
