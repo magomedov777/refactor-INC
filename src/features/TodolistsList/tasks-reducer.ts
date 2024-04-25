@@ -139,13 +139,14 @@ export const updateTaskTC =
           dispatch(updateTaskAC(taskId, domainModel, todolistId))
           dispatch(setStatusAC('succeeded'))
         } else {
-          handleServerAppError<{ item: TaskType }>(dispatch, res.data)
+          // handleServerAppError<{ item: TaskType }>(dispatch, res.data)
+          dispatch(setStatusAC('failed'))
         }
       })
       .catch((e: AxiosError) => {
-        // dispatch(setErrorAC(e.message))
-        // dispatch(setStatusAC('failed'))
-        handleServerNetworkError(dispatch, e.message)
+        dispatch(setErrorAC(e.message))
+        dispatch(setStatusAC('failed'))
+        // handleServerNetworkError(dispatch, e.message)
       })
   }
 
