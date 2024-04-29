@@ -10,7 +10,6 @@ import {
   TodolistDomainType,
 } from './todolists-reducer'
 import { addTaskTC, removeTaskTC, TasksStateType, updateTaskTC } from './tasks-reducer'
-import { TaskStatuses } from '../../api/todolists-api'
 import { AddItemForm } from '../../components/AddItemForm/AddItemForm'
 import { Todolist } from './Todolist/Todolist'
 
@@ -18,6 +17,7 @@ import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import { Navigate } from 'react-router-dom'
 import { Login } from '../Login/Login'
+import { TaskStatuses } from '../../enums'
 
 export const TodolistsList: React.FC = () => {
   const todolists = useAppSelector<Array<TodolistDomainType>>((state) => state.todolists)
