@@ -6,10 +6,10 @@ import {
   setAppInitializedAC,
   setStatusAC,
 } from '../../app/app-reducer'
-import { authAPI } from '../../api/todolists-api'
 import { LoginDataType } from './Login'
-import { handleServerAppError, handleServerNetworkError } from '../../utills/error-utills'
-import { AxiosError } from 'axios'
+import { authAPI } from '../../api/auth-api'
+import { handleServerAppError } from '../../utills/handle-server-app-error'
+import { handleServerNetworkError } from '../../utills/handle-server-network-error'
 
 const initialState = {
   isLoggedIn: false,
